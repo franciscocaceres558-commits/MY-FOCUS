@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05050a">
+<title>FOCUS — Tu espacio personal</title>
+<style>
+:root{--bg:#05050a;--panel:rgba(17,19,32,.88);--line:#ffffff18;--blue:#48a4ff;--purple:#ad75ff;--muted:#a5a6bf;--text:#f5f6ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:18px 14px 38px;overflow-x:hidden;isolation:isolate}
+button,input,select{font:inherit}
+button{border:0;border-radius:12px;padding:12px 14px;min-height:42px;font-size:13px;font-weight:750;cursor:pointer;transition:transform .15s,border-color .2s,filter .2s}
+button:active{transform:scale(.98)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+#fondo{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;background:#05050a}
+.glow{position:absolute;width:65vw;height:65vw;max-width:430px;max-height:430px;border-radius:50%;filter:blur(85px);opacity:.3;animation:flotar 12s ease-in-out infinite alternate}
+.azul{background:#005dff;top:-15%;left:-20%}.violeta{background:#7900ff;bottom:-15%;right:-20%;animation-delay:-6s}.celeste{background:#00bfff;top:40%;left:45%;opacity:.13;animation-duration:17s}
+@keyframes flotar{to{transform:translate(25%,20%) scale(1.2) rotate(15deg)}}
+#particulas{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.app{max-width:650px;margin:auto}
+header{text-align:center;padding:14px 0 24px}
+.tag{display:inline-block;color:#a7d5ff;border:1px solid #48a4ff55;border-radius:30px;padding:7px 13px;font-size:10px;letter-spacing:3px;margin-bottom:15px}
+h1{font-size:clamp(34px,9vw,44px);letter-spacing:-1.5px;margin-bottom:7px}
+.degrade{background:linear-gradient(90deg,#48a4ff,#b77aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#fecha{color:var(--muted);font-size:13px;margin-bottom:13px;text-transform:capitalize}
+#reloj{font-size:clamp(31px,8vw,39px);font-weight:850;letter-spacing:3px;text-shadow:0 0 25px #268aff66;font-variant-numeric:tabular-nums}
+.panel,.stat{background:var(--panel);border:1px solid var(--line);border-radius:20px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.panel{padding:19px;margin-bottom:15px;box-shadow:0 14px 40px #0004}
+h2{font-size:17px;margin-bottom:15px}
+.resumen{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:15px}
+.stat{text-align:center;padding:14px 4px}
+.stat strong{display:block;font-size:24px;margin-bottom:4px}
+.stat span{color:var(--muted);font-size:10px}
+.stat:nth-child(1) strong{color:#8ecbff}.stat:nth-child(2) strong{color:#c4a1ff}.stat:nth-child(3) strong{color:#76e6bc}
+.progreso-panel{position:relative;overflow:hidden;border-color:#48a4ff40;background:linear-gradient(135deg,rgba(15,27,55,.95),rgba(34,15,59,.92))}
+.progreso-panel:before{content:"";position:absolute;width:160px;height:160px;right:-70px;top:-80px;border-radius:50%;background:#347dff;filter:blur(65px);opacity:.35;pointer-events:none}
+.progreso-top,.progreso-info{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.progreso-top h2{margin:7px 0 0;font-size:25px}
+.progreso-label{font-size:10px;letter-spacing:2.5px;color:#8ecbff}
+.xp-badge{padding:9px 11px;border-radius:10px;color:#d6c1ff;background:#9d65ff20;border:1px solid #a66bff55;font-weight:800;font-size:12px;white-space:nowrap}
+.progreso-info{margin:19px 0 9px;color:#bfc6df;font-size:12px}
+.progreso-info strong{color:#8bcaff;font-size:15px}
+.barra-fondo{width:100%;height:10px;border-radius:20px;background:#ffffff12;overflow:hidden}
+.barra-valor{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#168cff,#a65bff);box-shadow:0 0 18px #438dff99;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.mensaje-progreso{margin-top:12px;font-size:12px;line-height:1.6;color:#b9b9d5}
+.nivel-detalle{font-size:11px;color:#9e9eb8;margin-top:5px}
+label{display:block;font-size:12px;color:#b9b9cc;margin:13px 0 7px}
+input,select{width:100%;min-height:46px;border:1px solid #343447;border-radius:12px;padding:11px 12px;background:#090910;color:white;font-size:14px;outline:none;color-scheme:dark}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #48a4ff20}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.primary{width:100%;margin-top:15px;color:white;background:linear-gradient(100deg,#087cff,#8747ff)}
+.secondary{color:#b7dcff;background:#48a4ff12;border:1px solid #48a4ff38}
+.full{width:100%;margin-top:10px}
+.focusbtn{width:100%;margin-bottom:15px;color:#e3d1ff;background:#a66bff13;border:1px solid #a66bff55}
+#focusStatus{display:none;text-align:center;color:#c5aaff;font-size:12px;margin:0 0 13px}
+.nota{font-size:10px;color:#9292aa;line-height:1.55;margin-top:11px}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:13px}
+.toolbar input{flex:1;min-width:0}
+.toolbar select{width:125px;flex-shrink:0}
+#lista{display:flex;flex-direction:column;gap:10px}
+.tarea{padding:14px;border:1px solid #ffffff17;border-radius:15px;background:#090910c9;animation:entrada .3s ease}
+@keyframes entrada{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.done{opacity:.52}.done .nombre{text-decoration:line-through}
+.fila{display:flex;gap:10px;align-items:flex-start}
+.check{width:25px;height:25px;min-height:25px;padding:0;flex-shrink:0;color:white;border:1px solid #50506a;background:transparent;border-radius:8px}
+.done .check{background:#2786ff;border-color:#2786ff}
+.info{flex:1;min-width:0}.nombre{font-size:14px;font-weight:750;overflow-wrap:anywhere}.hora{color:#a8a8bc;font-size:11px;margin-top:6px}
+.prioridad{display:inline-block;margin-top:7px;padding:4px 7px;border-radius:7px;font-size:9px;font-weight:800;letter-spacing:.5px}
+.prioridad.Alta{color:#ff9aa8;background:#ff526d15}.prioridad.Media{color:#ffd58b;background:#ffbd4a14}.prioridad.Baja{color:#8fdcbf;background:#43d6a014}
+.acciones{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.small{min-height:33px;padding:7px 10px;font-size:11px}
+.remove{color:#ff9aa8;background:#ff526d12;border:1px solid #ff526d33}.edit{color:#a7d4ff;background:#48a4ff12;border:1px solid #48a4ff33}
+.vacio{text-align:center;color:#9d9db2;padding:22px 7px;font-size:13px;line-height:1.7}
+.sub{font-size:11px;color:#9292aa;margin-top:-7px;margin-bottom:14px}
+.two-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.two-buttons button{width:100%}
+.pomodoro{text-align:center}
+.timer{font-size:clamp(42px,12vw,58px);font-weight:850;letter-spacing:2px;font-variant-numeric:tabular-nums;margin:10px 0;text-shadow:0 0 24px #8b5cff55}
+.timer-mode{font-size:10px;letter-spacing:2px;color:#bda0ff;text-transform:uppercase}
+.timer-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.timer-controls button{min-width:100px}
+.timer-track{height:5px;background:#ffffff12;border-radius:20px;overflow:hidden;margin-top:14px}
+.timer-track div{height:100%;width:100%;background:linear-gradient(90deg,#48a4ff,#b77aff);transition:width .3s linear}
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.mini-stat{border:1px solid #ffffff13;border-radius:14px;padding:13px;background:#0909108c}
+.mini-stat strong{font-size:21px;display:block;margin-bottom:4px}.mini-stat span{font-size:10px;color:var(--muted)}
+.achievements{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.achievement{border:1px solid #ffffff16;border-radius:14px;padding:12px;background:#0909109c;opacity:.43}
+.achievement.unlocked{opacity:1;border-color:#9b75ff66;background:linear-gradient(135deg,#22204499,#101421)}
+.achievement .emoji{font-size:22px;display:block;margin-bottom:7px}
+.achievement strong{display:block;font-size:12px;margin-bottom:4px}.achievement span:last-child{font-size:10px;color:var(--muted);line-height:1.4}
+.focus-note{text-align:center;font-size:11px;color:#9999b1;margin-top:12px}
+footer{text-align:center;color:#73738b;font-size:10px;padding-top:12px;letter-spacing:.7px}
+body.focus header,body.focus .resumen,body.focus #formPanel,body.focus #extraPanel,body.focus footer{display:none}
+body.focus #focusStatus{display:block}
+body.focus .panel{margin-top:13px}
+body.focus .tarea:not(.done){border-color:#48a4ff66}
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:10;background:#17192b;border:1px solid #ffffff25;border-radius:13px;padding:12px 16px;font-size:12px;box-shadow:0 10px 35px #0008;transition:opacity .25s,transform .25s;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.confetti{position:fixed;z-index:9;pointer-events:none;font-size:20px;animation:confettiUp 1.2s ease-out forwards}
+@keyframes confettiUp{from{opacity:1;transform:translateY(0) scale(.7) rotate(0)}to{opacity:0;transform:translateY(-100px) scale(1.4) rotate(35deg)}}
+@media(max-width:390px){body{padding:13px 10px 30px}.panel{padding:15px}.toolbar{flex-direction:column;align-items:stretch}.toolbar select{width:100%}.form-grid{gap:7px}.achievements{gap:7px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="fondo"><div class="glow azul"></div><div class="glow violeta"></div><div class="glow celeste"></div></div>
+<canvas id="particulas"></canvas>
+<main class="app">
+<header>
+  <div class="tag">TU ESPACIO PERSONAL</div>
+  <h1>Mi <span class="degrade">Focus</span></h1>
+  <p id="fecha"></p>
+  <div id="reloj">00:00:00</div>
+</header>
+
+<div class="resumen">
+  <div class="stat"><strong id="total">0</strong><span>Tareas totales</span></div>
+  <div class="stat"><strong id="pendientes">0</strong><span>Pendientes</span></div>
+  <div class="stat"><strong id="hechas">0</strong><span>Completadas</span></div>
+</div>
+
+<section class="panel progreso-panel">
+  <div class="progreso-top">
+    <div><span class="progreso-label">TU RENDIMIENTO</span><h2>⚡ Nivel <span id="nivel">1</span></h2></div>
+    <div class="xp-badge" id="xp">0 XP</div>
+  </div>
+  <div class="progreso-info"><span>Progreso de tareas</span><strong id="porcentaje">0%</strong></div>
+  <div class="barra-fondo"><div class="barra-valor" id="barra"></div></div>
+  <div class="nivel-detalle" id="detalleNivel">0 / 500 XP para el próximo nivel</div>
+  <p id="mensajeProgreso" class="mensaje-progreso">Tu próxima versión empieza con una tarea.</p>
+</section>
+
+<button class="focusbtn" id="focusBtn">◉ Activar modo concentración</button>
+<div id="focusStatus">Modo concentración activado · Una tarea a la vez</div>
+
+<section class="panel" id="formPanel">
+  <h2>✦ Nueva tarea</h2>
+  <form id="formulario">
+    <label for="nombre">¿Qué tenés que hacer?</label>
+    <input id="nombre" maxlength="120" placeholder="Ej. Estudiar matemática" required>
+    <div class="form-grid">
+      <div><label for="hora">¿A qué hora?</label><input id="hora" type="time" required></div>
+      <div><label for="prioridad">Prioridad</label><select id="prioridad"><option value="Media">Media</option><option value="Alta">Alta</option><option value="Baja">Baja</option></select></div>
+    </div>
+    <button class="primary" type="submit">＋ Agregar tarea</button>
+  </form>
+  <button class="secondary full" id="avisos" type="button">♧ Activar avisos</button>
+  <p class="nota">Los avisos requieren permiso del navegador. En iPhone pueden estar limitados si la página no está abierta.</p>
+</section>
+
+<section class="panel">
+  <h2>◈ Mis tareas</h2>
+  <p class="sub" id="contador">Organizá tu día</p>
+  <div class="toolbar">
+    <input id="buscar" type="search" placeholder="⌕ Buscar tarea..." aria-label="Buscar tareas">
+    <select id="filtro" aria-label="Filtrar tareas"><option value="todas">Todas</option><option value="pendientes">Pendientes</option><option value="hechas">Completadas</option><option value="Alta">Prioridad alta</option></select>
+  </div>
+  <div id="lista"></div>
+  <div class="two-buttons">
+    <button class="secondary" id="completarTodas" type="button">✓ Completar pendientes</button>
+    <button class="remove" id="borrarHechas" type="button">⌫ Borrar completadas</button>
+  </div>
+</section>
+
+<section class="panel pomodoro">
+  <h2>◷ Zona de concentración</h2>
+  <div class="timer-mode" id="timerMode">Tiempo de enfoque</div>
+  <div class="timer" id="timer">25:00</div>
+  <p class="sub" id="timerCaption">Una sesión a la vez. Alejá las distracciones.</p>
+  <div class="timer-track"><div id="timerBar"></div></div>
+  <div class="timer-controls">
+    <button class="primary" id="timerStart">▶ Empezar</button>
+    <button class="secondary" id="timerReset">↺ Reiniciar</button>
+    <button class="secondary" id="timerSwitch">☕ Descanso</button>
+  </div>
+  <p class="nota">Pomodoro: 25 minutos de enfoque y 5 de descanso. El temporizador funciona mientras esta página está abierta.</p>
+</section>
+
+<section class="panel" id="extraPanel">
+  <h2>▦ Tus estadísticas</h2>
+  <div class="stats-grid">
+    <div class="mini-stat"><strong id="statRacha">0 🔥</strong><span>Días de racha</span></div>
+    <div class="mini-stat"><strong id="statSesiones">0</strong><span>Pomodoros terminados</span></div>
+    <div class="mini-stat"><strong id="statHoy">0</strong><span>Tareas hechas hoy</span></div>
+    <div class="mini-stat"><strong id="statXP">0</strong><span>XP acumulados</span></div>
+  </div>
+  <p class="nota">Las estadísticas se guardan en este navegador y en este dispositivo.</p>
+</section>
+
+<section class="panel" id="logrosPanel">
+  <h2>🏆 Logros</h2>
+  <p class="sub">Desbloqueá insignias mientras avanzás.</p>
+  <div class="achievements" id="logros"></div>
+</section>
+
+<footer>FOCUS · ORGANIZÁ TU TIEMPO · UN PASO A LA VEZ</footer>
+</main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const hoyKey = () => new Date().toLocaleDateString("en-CA");
+let tareas = [];
+let avisosActivos = false;
+let notificadas = new Set();
+let toastTimer;
+let timerInterval = null;
+let timerModo = "focus";
+let timerRestante = 25 * 60;
+let timerCorriendo = false;
+let datos = {xp:0, completadasHoy:[], racha:0, ultimoDia:"", sesiones:0, logros:[]};
+const DURACIONES = {focus:25*60, break:5*60};
+const logrosDef = [
+  {id:"primera",emoji:"🌱",nombre:"Primer paso",desc:"Completá tu primera tarea.",ok:()=>datos.xp>=100},
+  {id:"tres",emoji:"⚡",nombre:"En movimiento",desc:"Acumulá 300 XP.",ok:()=>datos.xp>=300},
+  {id:"cinco",emoji:"🔥",nombre:"Imparable",desc:"Acumulá 500 XP.",ok:()=>datos.xp>=500},
+  {id:"nivel3",emoji:"💎",nombre:"Subiendo",desc:"Alcanzá el nivel 3.",ok:()=>Math.floor(datos.xp/500)+1>=3},
+  {id:"pomodoro",emoji:"⏱️",nombre:"Enfocado",desc:"Terminá un Pomodoro.",ok:()=>datos.sesiones>=1},
+  {id:"racha3",emoji:"📅",nombre:"Constancia",desc:"Mantené una racha de 3 días.",ok:()=>datos.racha>=3}
+];
+
+try {
+  const saved = JSON.parse(localStorage.getItem("focusTareasPro") || "null");
+  if (saved && Array.isArray(saved.tareas)) tareas = saved.tareas;
+  else {
+    const old = JSON.parse(localStorage.getItem("focusTareas") || "[]");
+    if (Array.isArray(old)) tareas = old.map(t=>({...t,prioridad:t.prioridad||"Media",fechaHecha:t.fechaHecha||""}));
+  }
+  const savedDatos = JSON.parse(localStorage.getItem("focusDatosPro") || "null");
+  if (savedDatos && typeof savedDatos==="object") datos = {...datos,...savedDatos};
+} catch(e) {}
+
+tareas = tareas.map(t=>({...t, prioridad:["Alta","Media","Baja"].includes(t.prioridad)?t.prioridad:"Media", fechaHecha:t.fechaHecha||""}));
+function guardar(){
+  try {
+    localStorage.setItem("focusTareasPro",JSON.stringify({tareas}));
+    localStorage.setItem("focusDatosPro",JSON.stringify(datos));
+    localStorage.setItem("focusTareas",JSON.stringify(tareas));
+  } catch(e) {}
+}
+function mostrarToast(texto){
+  $("toast").textContent=texto;
+  $("toast").classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>$("toast").classList.remove("show"),2600);
+}
+function confeti(){
+  const items=["✦","✧","✺","★","＋"];
+  for(let i=0;i<12;i++){
+    const el=document.createElement("span");el.className="confetti";
+    el.textContent=items[Math.floor(Math.random()*items.length)];
+    el.style.left=(10+Math.random()*80)+"%";el.style.top=(50+Math.random()*25)+"%";
+    el.style.color=Math.random()>.5?"#72bcff":"#bd8aff";
+    document.body.append(el);setTimeout(()=>el.remove(),1300);
+  }
+}
+function actualizarReloj(){
+  const ahora=new Date();
+  $("reloj").textContent=ahora.toLocaleTimeString("es-AR",{hour12:false});
+  $("fecha").textContent=ahora.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  revisarAvisos();
+}
+function actualizarRacha(){
+  const hoy=hoyKey();
+  if(datos.ultimoDia===hoy)return;
+  const ayer=new Date();ayer.setDate(ayer.getDate()-1);
+  const ayerKey=ayer.toLocaleDateString("en-CA");
+  if(datos.ultimoDia && datos.ultimoDia!==ayerKey) datos.racha=0;
+  if(datos.completadasHoy.length>0 && datos.completadasHoy.some(x=>x===hoy)){
+    if(datos.ultimoDia!==hoy) datos.racha=Math.max(1,datos.racha);
+    datos.ultimoDia=hoy;
+  }
+}
+function actualizarResumen(){
+  $("total").textContent=tareas.length;
+  $("pendientes").textContent=tareas.filter(t=>!t.done).length;
+  $("hechas").textContent=tareas.filter(t=>t.done).length;
+  $("contador").textContent=tareas.length ? `${tareas.length} tarea(s) guardada(s)` : "Agregá tu primera tarea";
+  const hechasHoy=tareas.filter(t=>t.done&&t.fechaHecha===hoyKey()).length;
+  $("statHoy").textContent=hechasHoy;
+  $("statRacha").textContent=datos.racha+" 🔥";
+  $("statSesiones").textContent=datos.sesiones;
+  $("statXP").textContent=datos.xp;
+  const total=tareas.length, hechas=tareas.filter(t=>t.done).length;
+  const porcentaje=total?Math.round(hechas/total*100):0;
+  const nivel=Math.floor(datos.xp/500)+1;
+  const xpNivel=datos.xp%500;
+  $("nivel").textContent=nivel;
+  $("xp").textContent=datos.xp+" XP";
+  $("porcentaje").textContent=porcentaje+"%";
+  $("barra").style.width=porcentaje+"%";
+  $("detalleNivel").textContent=`${xpNivel} / 500 XP para el próximo nivel`;
+  let mensaje="Tu próxima versión empieza con una tarea.";
+  if(total>0&&porcentaje===100)mensaje="🏆 ¡Todas las tareas listas! Te lo ganaste.";
+  else if(hechas>=5)mensaje="🔥 Estás construyendo una gran disciplina.";
+  else if(hechas>0)mensaje="🚀 Buen comienzo. Seguí sumando progreso.";
+  $("mensajeProgreso").textContent=mensaje;
+  dibujarLogros();
+}
+function boton(texto,clase,accion,etiqueta){
+  const b=document.createElement("button");b.type="button";b.textContent=texto;b.className=clase;
+  if(etiqueta)b.setAttribute("aria-label",etiqueta);
+  b.addEventListener("click",accion);return b;
+}
+
+function actualizarProgreso() {
+  const total = tareas.length;
+  const hechas = tareas.filter(t => t.done).length;
+  const porcentaje = total
+    ? Math.round((hechas / total) * 100)
+    : 0;
+
+  const experiencia = hechas * 100;
+  const nivel = Math.floor(experiencia / 500) + 1;
+  const progresoNivel = experiencia % 500;
+
+  $("nivel").textContent = nivel;
+  $("xp").textContent = experiencia + " XP";
+  $("porcentaje").textContent = porcentaje + "%";
+  $("barra").style.width = porcentaje + "%";
+
+  let mensaje = "Tu próxima versión empieza con una tarea.";
+
+  if (total > 0 && porcentaje === 100) {
+    mensaje = "🏆 ¡DÍA COMPLETADO! Hoy cumpliste con todo.";
+  } else if (hechas >= 5) {
+    mensaje = "🔥 Estás construyendo una gran disciplina.";
+  } else if (hechas > 0) {
+    mensaje = "🚀 Buen comienzo. Seguí sumando progreso.";
+  }
+
+  $("mensajeProgreso").textContent =
+    mensaje + " · " + progresoNivel + "/500 XP para el próximo nivel.";
+}
+
+$("completarTodas").addEventListener("click", () => {
+  const pendientes = tareas.filter(t => !t.done);
+
+  if (pendientes.length === 0) {
+    alert("No hay tareas pendientes. ¡Todo al día!");
+    return;
+  }
+
+  if (!confirm("¿Marcar todas las tareas pendientes como completadas?")) {
+    return;
+  }
+
+  tareas.forEach(t => {
+    t.done = true;
+  });
+
+  guardar();
+  dibujar();
+  actualizarProgreso();
+});
+
+const dibujarOriginal = dibujar;
+
+dibujar = function() {
+  dibujarOriginal();
+  actualizarProgreso();
+};
+
+actualizarProgreso();
