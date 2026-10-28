@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Organizá tareas, registrá tu progreso y enfocá tu tiempo con FOCUS.">
+<meta name="theme-color" content="#070910">
+<title>D10 | FOCUS</title>
+
+<link rel="stylesheet" href="./styles/main.css">
+</head>
+
+<body>
+<canvas id="particles"></canvas>
+<div class="glow one"></div>
+<div class="glow two"></div>
+<div class="glow three"></div>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">D10</div>
+      <div>
+        <h1>FOCUS</h1>
+        <p>TU ESPACIO PRODUCTIVO</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="clock">00:00:00</div>
+      <div id="dateText">Cargando fecha...</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="panel">
+      <div class="eyebrow">✦ Tu próxima versión empieza hoy</div>
+      <h2>Menos excusas.<br><span class="gradient-text">Más resultados.</span></h2>
+      <p class="muted small">Organizá tus tareas, ganá experiencia, desbloqueá premios y convertí tus objetivos en logros reales.</p>
+      <button class="btn btn-primary" id="createTaskBtn">＋ Crear una tarea</button>
+      <button class="btn" id="focusBtn">◉ Modo enfoque</button>
+    </div>
+
+    <div class="level-card">
+      <div class="level-top">
+        <div>
+          <div class="eyebrow">Tu progreso</div>
+          <div class="level-number">NIVEL <span id="levelNumber">1</span></div>
+        </div>
+        <div class="coin-pill">🪙 <span id="coins">0</span> monedas</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="xpBar"></div></div>
+      <div class="level-top small muted">
+        <span id="xpText">0 / 500 XP</span>
+        <span id="xpTotal">0 XP total</span>
+      </div>
+      <p class="small" id="levelMessage">Cada tarea completada te acerca a tu siguiente nivel.</p>
+      <div class="tag">🎖️ <span id="playerTitle">Principiante</span></div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-icon">✅</div>
+      <div class="stat-number" id="doneCount">0</div>
+      <div class="stat-label">Tareas completadas</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">📌</div>
+      <div class="stat-number" id="pendingCount">0</div>
+      <div class="stat-label">Pendientes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-number" id="streakCount">0</div>
+      <div class="stat-label">Días de racha</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-number" id="achievementCount">0/6</div>
+      <div class="stat-label">Logros desbloqueados</div>
+    </div>
+  </section>
+
+  <main class="main-grid">
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <h3>📋 Mis tareas</h3>
+          <p>Un paso a la vez. Vos podés.</p>
+        </div>
+        <span class="tag" id="taskCounter">0 tareas</span>
+      </div>
+
+      <form id="taskForm">
+        <div class="form-grid">
+          <input class="field" id="taskInput" placeholder="¿Qué querés lograr hoy?" maxlength="120" required>
+          <input class="field" id="taskTime" type="time" aria-label="Hora de la tarea">
+        </div>
+        <div class="form-bottom">
+          <select class="field" id="taskPriority" aria-label="Prioridad">
+            <option value="media">Prioridad media</option>
+            <option value="alta">🔴 Prioridad alta</option>
+            <option value="baja">🟢 Prioridad baja</option>
+          </select>
+          <button class="btn btn-primary" id="submitTask" type="submit">＋ Agregar tarea</button>
+        </div>
+      </form>
+
+      <button class="btn" id="notificationBtn" type="button">🔔 Activar avisos</button>
+
+      <div class="search-row">
+        <input class="field" id="searchInput" placeholder="🔎 Buscar tarea...">
+        <select class="field" id="filterSelect" aria-label="Filtrar tareas">
+          <option value="todas">Todas</option>
+          <option value="pendientes">Pendientes</option>
+          <option value="hechas">Completadas</option>
+          <option value="alta">Prioridad alta</option>
+        </select>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+
+      <div class="task-bulk-actions">
+        <button class="btn btn-green" id="completeAll">✓ Completar pendientes</button>
+        <button class="btn btn-danger" id="clearDone">Limpiar completadas</button>
+      </div>
+      <p class="muted small">💡 Consejo: las tareas completadas te dan XP y pueden desbloquear premios.</p>
+    </section>
+
+    <div class="side-stack">
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h3>🍅 Zona de concentración</h3>
+            <p>Un rato de enfoque, una pausa y seguís.</p>
+          </div>
+        </div>
+        <div class="timer">
+          <div class="tag" id="timerMode">SESIÓN DE ENFOQUE</div>
+          <div class="timer-circle" id="timerCircle">
+            <div id="timerDisplay">25:00</div>
+          </div>
+          <div class="timer-controls">
+            <button class="btn btn-primary" id="timerStart">▶️ Iniciar</button>
+            <button class="btn" id="timerReset">↻ Reiniciar</button>
+            <button class="btn" id="timerSwitch">☕ Descanso</button>
+          </div>
+          <p class="muted small" id="timerMessage">25 minutos para vos y tus objetivos.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h3>🏆 Sala de logros</h3>
+            <p>Desbloqueá medallas y ganá recompensas.</p>
+          </div>
+        </div>
+        <div class="achievements" id="achievements"></div>
+        <div class="reward-title">
+          <div class="eyebrow">🎁 Tu título actual</div>
+          <strong id="titleDisplay">Principiante</strong>
+          <p id="titleDescription">Todo gran progreso empieza con el primer paso.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h3>🌟 Tu misión de hoy</h3>
+            <p>El progreso se construye con constancia.</p>
+          </div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="dailyBar"></div></div>
+        <div class="level-top small">
+          <span class="muted">Objetivo: 3 tareas</span>
+          <strong id="dailyText">0/3</strong>
+        </div>
+        <p class="small muted" id="dailyMessage">Completá 3 tareas para cumplir tu misión diaria.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer>D10 · FOCUS SYSTEM — TU DISCIPLINA, TU PROGRESO, TUS REGLAS</footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
